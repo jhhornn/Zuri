@@ -1,10 +1,16 @@
 import random
+import validation
+
 database = {}
 
 def init():
     print("Welcome to BankPHP")
     
-    haveAccount = int(input('Do you have account with us:\n 1 (yes) \n 2 (no)\n'))
+    try:
+        haveAccount = int(input('Do you have account with us:\n 1 (yes) \n 2 (no)\n'))
+    except ValueError:
+        print('Selected option is not a number')
+        init()
         
     if(haveAccount == 1):
         login()
@@ -12,6 +18,7 @@ def init():
         register()
     else:
         print('You have selected an invalid option')
+        init()
             
             
       
@@ -20,20 +27,22 @@ def login():
     print("***********Login**********")
     
 
-    accountNumberFromUser = int(input("What is your account number? \n"))
-    password = input("What is your password? \n")
-        
-    for accountNumber, userDetails in database.items():
-        if(accountNumber == accountNumberFromUser):
-            if(userDetails[3] == password):
-                bankOperation(userDetails)
-            else:
-                print("Invalid acount passsword")
-                login()
+    accountNumberFromUser = input("What is your account number? \n")
     
+    is_valid_account = validation.account_number_validation(accountNumberFromUser)
     
-    
-    
+    if is_valid_account:
+        password = input("What is your password? \n")
+            
+        for accountNumber, userDetails in database.items():
+            if accountNumber == int(accountNumberFromUser):
+                if(userDetails[3] == password):
+                    bankOperation(userDetails)
+                else:
+                    print("Invalid acount passsword")
+                    login()
+    else:
+        login()
     
     
 def register():
@@ -51,8 +60,14 @@ def register():
         if(password == confirmPassword):
             password = password
             print("password set!")
-            accountNumber = generationAccountNumber()
+            
+            try:
+                accountNumber = generationAccountNumber()
+            except:
+                print('Account generation failed due to internet error')
+                exit()
 
+            
             database[accountNumber] = [first_name, last_name, email, password]
 
             print("Your account has been created!")
@@ -85,8 +100,12 @@ def generationAccountNumber():
 def bankOperation(user):
     print("welcome %s %s"%(user[0], user[1]))
     
-    selectedOption = int(input("What would you like to do? \n (1) deposit \n (2) withdraw \n (3) check balance \n (4) logout \n (5) exit \n"))
-
+    try:
+        selectedOption = int(input("What would you like to do? \n (1) deposit \n (2) withdraw \n (3) check balance \n (4) logout \n (5) exit \n"))
+    except:
+        print('Selection must be a number')
+        bankOperation(user)
+        
     if(selectedOption == 1):
         depositOperation()
         
@@ -134,7 +153,17 @@ def depositOperation():
 
 def withdrawOperation():
     cash = int(input('How much would you like to withdraw'))
-    print('Take your cash \n')    
+    if confirmCheck(cash):
+        print(f'You have successfully withdrawn {cash} \n')
+    else:
+        print('Insuffiecient fund') 
+    
+    
+def confirmCheck(amount):
+    if depositOperation() >= amount:
+        return True
+    return False
+         
     
     
 def logout():
