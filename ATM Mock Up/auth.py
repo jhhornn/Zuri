@@ -37,6 +37,8 @@ def login():
         for accountNumber, userDetails in database.items():
             if accountNumber == int(accountNumberFromUser):
                 if(userDetails[3] == password):
+                    print('\n')
+                    initialAccountBalance(userDetails)
                     bankOperation(userDetails)
                 else:
                     print("Invalid acount passsword")
@@ -68,7 +70,7 @@ def register():
                 exit()
 
             
-            database[accountNumber] = [first_name, last_name, email, password]
+            database[accountNumber] = [first_name, last_name, email, password,0]
 
             print("Your account has been created!")
             print("\n")
@@ -85,7 +87,11 @@ def register():
 
             #print("")
     
-    
+
+def initialAccountBalance(user):
+    print(f'Your initial balance is {user[4]}')
+    currentAccountBalance = user[4]
+    return currentAccountBalance
 
 
 
@@ -113,12 +119,14 @@ def bankOperation(user):
         withdrawOperation()
         
     elif(selectedOption == 3):
-        checkBalance()
+        for accountName, userDetails in database.items():
+            currentBalance(userDetails)
         
     elif(selectedOption == 4):
         logout()
         
     elif(selectedOption == 5):
+        print('Thank you for banking with us')
         exit()
         
     else:
@@ -131,37 +139,52 @@ def bankOperation(user):
         print("\n")
         bankOperation(user)
     elif (anotherOption == 2):
+        print('Thank you for banking with us')
         exit()
     else:
         print("Invalid option selected")
 
 
 
+# def checkBalance():
+#     for accountName, userDetails in database.items():
+#         if depositOperation() is not None:
+#             return currentBalance(userDetails) + depositOperation()
+#         else:
+#             return currentBalance(userDetails)
 
+def currentBalance(user):
+    print(f'Your cuurent account balance is {user[4]}')
 
-def checkBalance():
-    current_balance = 0
-    current_balance += depositOperation()
-    print('Your current balance is %s' % current_balance)
 
     
 def depositOperation():
-    deposit = int(input('How much would you like to deposit: \n'))
-    print("The sum of %s has been deposited into your account" % deposit)
-    return deposit
+    for accountName, userDetails in database.items():
+        deposit = int(input('How much would you like to deposit: \n'))
+        userDetails[4]+=deposit
+        print("The sum of %s has been deposited into your account" % deposit)
+        print('Your current balance is %s'% userDetails[4]) 
+    # def returnDeposit():
+    #     summation = (int(currentBalance(userDetails))+deposit)
+    #     return summation
+    # return returnDeposit()
+
 
 
 def withdrawOperation():
-    cash = int(input('How much would you like to withdraw'))
+    cash = int(input('How much would you like to withdraw\n'))
     if confirmCheck(cash):
+        for accountName, userDetails in database.items():
+            userDetails[4] -= cash
         print(f'You have successfully withdrawn {cash} \n')
     else:
         print('Insuffiecient fund') 
     
     
 def confirmCheck(amount):
-    if depositOperation() >= amount:
-        return True
+    for accountName, userDetails in database.items():
+        if userDetails[4] >= amount:
+            return True
     return False
          
     
