@@ -1,7 +1,8 @@
 import random
 import validation
+import database
 
-database = {}
+#database = {}
 
 def init():
     print("Welcome to BankPHP")
@@ -70,17 +71,25 @@ def register():
                 exit()
 
             
-            database[accountNumber] = [first_name, last_name, email, password,0]
+            #database[accountNumber] = [first_name, last_name, email, password,0]
 
-            print("Your account has been created!")
-            print("\n")
-            print("=== ===== ===== ===")
-            print("Your account number is %s" % accountNumber)
-            print("Make sure you keep it safe")
-            print("=== ===== ===== ===")
-            setPassword = True
-            print("\n")
-            login()
+            is_user_created = database.create(accountNumber, [first_name, last_name, email, password, 0])
+            
+            
+            if is_user_created:
+                print("Your account has been created!")
+                print("\n")
+                print("=== ===== ===== ===")
+                print("Your account number is %s" % accountNumber)
+                print("Make sure you keep it safe")
+                print("=== ===== ===== ===")
+                setPassword = True
+                print("\n")
+                login()
+                
+            else:
+                print('Something went wrong')
+                register()
         else:
             print("password don't match")
             confirmPassword = input("confirm password \n")
@@ -154,7 +163,7 @@ def bankOperation(user):
 #             return currentBalance(userDetails)
 
 def currentBalance(user):
-    print(f'Your cuurent account balance is {user[4]}')
+    print(f'Your current account balance is {user[4]}')
 
 
     
@@ -172,14 +181,15 @@ def depositOperation():
 
 
 def withdrawOperation():
-    cash = int(input('How much would you like to withdraw\n'))
-    if confirmCheck(cash):
-        for accountName, userDetails in database.items():
+    for accountName, userDetails in database.items():
+        print[f'Your balance is {userDetails[4]}']
+        cash = int(input('How much would you like to withdraw\n'))
+        if confirmCheck(cash):
             userDetails[4] -= cash
-        print(f'You have successfully withdrawn {cash} \n')
-    else:
-        print('Insuffiecient fund') 
-    
+            print(f'You have successfully withdrawn {cash} \n')
+        else:
+            print('Insuffiecient fund') 
+        
     
 def confirmCheck(amount):
     for accountName, userDetails in database.items():
