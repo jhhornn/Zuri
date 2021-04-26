@@ -8,7 +8,7 @@ import os
 
 # file = os.getcwd()
 
-user_db_path = "ATM Mock Up/dbhnjgbhata/user_record/"
+user_db_path = "ATM Mock Up/data/user_record/"
 
 def create(account_number, user_details):
     completion_state = False
@@ -19,7 +19,7 @@ def create(account_number, user_details):
     except FileExistsError:
         print('User already exists')
         #delete the already created file, and print out
-        delete(account_number)
+        #delete(account_number)
         
     
     else:
@@ -50,7 +50,7 @@ def delete(user_account_number):
     
     is_delete_successful = False
     
-    if os.path.exists(user_db_path + str(user_account_number)):
+    if os.path.exists(user_db_path + str(user_account_number) + ".txt"):
         try:
             os.remove(user_db_path + str(user_account_number) + ".txt")
             is_delete_successful = True
