@@ -1,8 +1,9 @@
 import random
 import validation
 import database
+from getpass import getpass #password not visible to third party
 
-#database = {}
+temp_acct_list = []
 
 def init():
     print("Welcome to BankPHP")
@@ -33,17 +34,30 @@ def login():
     is_valid_account = validation.account_number_validation(accountNumberFromUser)
     
     if is_valid_account:
-        password = input("What is your password? \n")
+        #password = input("What is your password? \n")
+        password = getpass("What is your password? \n")
+        
+        
+        user = database.authenticated_user(accountNumberFromUser, password)
             
-        for accountNumber, userDetails in database.items():
-            if accountNumber == int(accountNumberFromUser):
-                if(userDetails[3] == password):
-                    print('\n')
-                    initialAccountBalance(userDetails)
-                    bankOperation(userDetails)
-                else:
-                    print("Invalid acount passsword")
-                    login()
+        # for accountNumber, userDetails in database.items():
+        #     if accountNumber == int(accountNumberFromUser):
+        #         if(userDetails[3] == password):
+        #             print('\n')
+        #             initialAccountBalance(userDetails)
+        #             bankOperation(userDetails)
+        #         else:
+        #             print("Invalid acount passsword")
+        #             login()
+        
+        if user:
+            temp_acct_list.append(accountNumberFromUser)
+            initialAccountBalance(user)
+            bankOperation(user)
+        print('invalid account number or password')
+        login()
+            
+            
     else:
         login()
     
@@ -54,8 +68,8 @@ def register():
     email = input("What is your email address? \n")
     first_name = input("What is your first name \n")
     last_name = input("What is your last name? \n")
-    password = input("Create a password for yourself \n")
-    confirmPassword = input("confirm password \n")
+    password = getpass("Create a password for yourself \n")
+    confirmPassword = getpass("confirm password \n")
     
     setPassword = False
     
@@ -72,8 +86,8 @@ def register():
 
             
             #database[accountNumber] = [first_name, last_name, email, password,0]
-
-            is_user_created = database.create(accountNumber, [first_name, last_name, email, password, 0])
+            #prepared_user_details = first_name + "," + last_name + "," + email + "," + password + "," + str(0)
+            is_user_created = database.create(accountNumber, first_name, last_name, email, password)
             
             
             if is_user_created:
@@ -162,17 +176,18 @@ def bankOperation(user):
 #         else:
 #             return currentBalance(userDetails)
 
-def currentBalance(user):
-    print(f'Your current account balance is {user[4]}')
+def currentBalance():
+    amount = database.print_amount(temp_acct_list[0])
+    print(f'Your current account balance is {amount}')
 
 
     
 def depositOperation():
-    for accountName, userDetails in database.items():
-        deposit = int(input('How much would you like to deposit: \n'))
-        userDetails[4]+=deposit
-        print("The sum of %s has been deposited into your account" % deposit)
-        print('Your current balance is %s'% userDetails[4]) 
+    amount = database.print_amount(temp_acct_list[0])
+    deposit = int(input('How much would you like to deposit: \n'))
+    amount+=deposit
+    print("The sum of %s has been deposited into your account" % deposit)
+    print('Your current balance is %s'% amount) 
     # def returnDeposit():
     #     summation = (int(currentBalance(userDetails))+deposit)
     #     return summation
@@ -181,20 +196,20 @@ def depositOperation():
 
 
 def withdrawOperation():
-    for accountName, userDetails in database.items():
-        print[f'Your balance is {userDetails[4]}']
-        cash = int(input('How much would you like to withdraw\n'))
-        if confirmCheck(cash):
-            userDetails[4] -= cash
-            print(f'You have successfully withdrawn {cash} \n')
-        else:
-            print('Insuffiecient fund') 
+    amount = database.print_amount(temp_acct_list[0])
+    print[f'Your balance is {amount}']
+    cash = int(input('How much would you like to withdraw\n'))
+    if confirmCheck(cash):
+        amount -= cash
+        print(f'You have successfully withdrawn {cash} \n')
+    else:
+        print('Insuffiecient fund') 
         
     
 def confirmCheck(amount):
-    for accountName, userDetails in database.items():
-        if userDetails[4] >= amount:
-            return True
+    balance = database.print_amount(temp_acct_list[0])
+    if balance >= amount:
+        return True
     return False
          
     
