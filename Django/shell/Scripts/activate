@@ -82,6 +82,3 @@ pydoc () {
 # we made may not be respected
 hash -r 2>/dev/null
 
-
-export SECRET_KEY='django-insecure-o3-$=)wiefo72(1)xchz4u-a(kdwslqb)@u!c-!ets(#x^4&4%'
-export DEBUG=True
